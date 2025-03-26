@@ -57,20 +57,30 @@ const QRScannerWithUpload = () => {
   };
 
   // Scan QR code from uploaded file
-  const scanQRFromFile = (file) => {
-    const html5QrCode = new Html5Qrcode("file-qr-reader");
+  const scanQRFromFile = async (file) => {
+    setIsFileScanning(true);
+    setCameraError(null);
 
-    html5QrCode.scanFile(file, false)
-      .then(result => {
-        handleScanSuccess(result, null);
-      })
-      .catch(error => {
-        setCameraError("Failed to scan QR code from file: " + error);
-        console.error("File scan error:", error);
-      })
-      .finally(() => {
-        setIsFileScanning(false);
-      });
+    try {
+      const html5QrCode = new Html5Qrcode("file-qr-reader");
+      const result = await html5QrCode.scanFile(file, false);
+      handleScanSuccess(result, null);
+    } catch (error) {
+      let errorMessage = "Failed to scan QR code from file";
+
+      if (error.message.includes("No MultiFormat Readers")) {
+        errorMessage = "No QR code found in the image. Please try another file.";
+      } else if (error.message.includes("not found")) {
+        errorMessage = "File not found or corrupted. Please try again.";
+      } else {
+        errorMessage = `Scan error: ${error.message}`;
+      }
+
+      setCameraError(errorMessage);
+      console.error("File scan error:", error);
+    } finally {
+      setIsFileScanning(false);
+    }
   };
 
   // Handle successful scan
@@ -181,6 +191,15 @@ const QRScannerWithUpload = () => {
             )}
           </button>
 
+          <div className="file-requirements">
+            <p>For best results:</p>
+            <ul>
+              <li>Use clear, well-lit images</li>
+              <li>Ensure QR code fills most of the image</li>
+              <li>Supported formats: JPG, PNG, GIF</li>
+            </ul>
+          </div>
+
           <input
             type="file"
             ref={fileInputRef}
@@ -258,6 +277,7 @@ const QRScannerWithUpload = () => {
           )}
         </div>
       )}
+
     </div>
   );
 };
