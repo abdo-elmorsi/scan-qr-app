@@ -1,15 +1,12 @@
-// import MobileQRScanner from "./components/MobileQRScanner"
-// import MobileQRScannerTwo from "./components/MobileQRScannerTwo"
-import MobileQRScannerThree from "./components/MobileQRScannerThree"
+
+import MobileQRScanner from "./components/MobileQRScanner"
 
 
 function App() {
 
   return (
     <>
-      {/* <MobileQRScanner /> */}
-      {/* <MobileQRScannerTwo /> */}
-      <MobileQRScannerThree />
+      <MobileQRScanner />
     </>
   )
 }
